@@ -16,7 +16,7 @@ public class point
 
     public float acceleration = 0.0f;
 
-    private potwater water;
+    private water water;
 
     public float frictionForce;
     public float forceApplied;
@@ -25,7 +25,7 @@ public class point
 
 
     //initialize our point
-    public point(potwater waterObj, float y){
+    public point(water waterObj, float y){
         this.water = waterObj;
         this.y = y;
     }

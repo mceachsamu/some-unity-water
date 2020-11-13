@@ -20,7 +20,7 @@
         {
             Name "FORWARD_DELTA"
             Tags {
-            "LightMode" = "ForwardAdd"
+            "LightMode" = "ForwardBase"
             }
             CGPROGRAM
             #pragma target 3.0
@@ -31,7 +31,7 @@
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            #pragma multi_compile_fwdadd_fullshadows
+            #pragma multi_compile_fwdbase_fullshadows
             #include "AutoLight.cginc"
 
             struct v2f
@@ -44,7 +44,6 @@
                 half3 tspace0 : TEXCOORD3; // tangent.x, bitangent.x, normal.x
                 half3 tspace1 : TEXCOORD4; // tangent.y, bitangent.y, normal.y
                 half3 tspace2 : TEXCOORD5; // tangent.z, bitangent.z, normal.z
-                SHADOW_COORDS(6)
             };
 
             sampler2D _MainTex;
@@ -78,7 +77,6 @@
                 o.tspace0 = half3(wTangent.x, wBitangent.x, o.worldNormal.x);
                 o.tspace1 = half3(wTangent.y, wBitangent.y, o.worldNormal.y);
                 o.tspace2 = half3(wTangent.z, wBitangent.z, o.worldNormal.z);
-                TRANSFER_SHADOW(o);
                 return o;
             }
 
@@ -102,73 +100,11 @@
 
                 //apply saturation
                 col.rgb = col.rgb * _Saturation;
-
-                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
-
-                float shadow = SHADOW_ATTENUATION(i);
                 //fixed4 c = atten;
-                return col * shading * shadow;
+                return col;
             }
             ENDCG
         }
-
-        Pass {
-			Tags {
-				"LightMode" = "ShadowCaster"
-			}
-
-			CGPROGRAM
-
-			#pragma target 3.0
-
-			#pragma multi_compile_shadowcaster
-
-			#pragma vertex vert
-			#pragma fragment frag
-
-            #if !defined(MY_SHADOWS_INCLUDED)
-            #define MY_SHADOWS_INCLUDED
-
-            #include "UnityCG.cginc"
-
-            struct VertexData {
-                float4 position : POSITION;
-                float3 normal : NORMAL;
-            };
-
-            #if defined(SHADOWS_CUBE)
-                struct Interpolators {
-                    float4 position : SV_POSITION;
-                    float3 lightVec : TEXCOORD0;
-                };
-
-                Interpolators vert (VertexData v) {
-                    Interpolators i;
-                    i.position = UnityObjectToClipPos(v.position);
-                    i.lightVec = mul(unity_ObjectToWorld, i.position).xyz - _LightPositionRange.xyz;
-                    return i;
-                }
-
-                float4 frag (Interpolators i) : SV_TARGET {
-                    float depth = length(i.lightVec) + unity_LightShadowBias.x;
-                    depth *= _LightPositionRange.w;
-                    return UnityEncodeCubeShadowDepth(depth);
-                }
-            #else
-                float4 vert (VertexData v) : SV_POSITION {
-                    float4 position =
-                        UnityClipSpaceShadowCasterPos(v.position.xyz, v.normal);
-                    return UnityApplyLinearShadowBias(position);
-                }
-
-                half4 frag () : SV_TARGET {
-                    return 0;
-                }
-            #endif
-
-            #endif
-			ENDCG
-		}
 
     }
 }

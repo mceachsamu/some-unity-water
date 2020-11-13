@@ -25,12 +25,11 @@ public class underwater : MonoBehaviour
     }
 
     private void setShaderProperties(){
-        this.GetComponent<Renderer>().material.SetFloat("_WaterOpaqueness", water.GetComponent<potwater>().waterOpaqueness);
-        this.GetComponent<Renderer>().material.SetFloat("_WaterSize", water.GetComponent<potwater>().getSize());
-        this.GetComponent<Renderer>().material.SetTexture("_HeightMap", water.GetComponent<potwater>().heightMap);
-        this.GetComponent<Renderer>().material.SetVector("_PotCenter", water.GetComponent<potwater>().GetCenter());
+        this.GetComponent<Renderer>().material.SetFloat("_WaterOpaqueness", water.GetComponent<water>().waterOpaqueness);
+        this.GetComponent<Renderer>().material.SetFloat("_WaterSize", water.GetComponent<water>().getSize());
+        this.GetComponent<Renderer>().material.SetTexture("_HeightMap", water.GetComponent<water>().heightMap);
         this.GetComponent<Renderer>().material.SetFloat("_WaterLevel", water.GetComponent<Transform>().position.y);
-        this.GetComponent<Renderer>().material.SetFloat("_MaxHeight", water.GetComponent<potwater>().maxHeight);
+        this.GetComponent<Renderer>().material.SetFloat("_MaxHeight", water.GetComponent<water>().maxHeight);
         this.GetComponent<Renderer>().material.SetInt("_CullAboveWater", cullAboveWater);
     }
 

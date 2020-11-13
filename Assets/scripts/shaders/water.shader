@@ -1,21 +1,13 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-Shader "Unlit/water"
+﻿Shader "Unlit/water"
 {
     Properties
     {
         _Tex ("Texture", 2D) = "white" {}//the main texture-- used as the height map
         _RenderTex ("RenderTexture", 2D) = "white" {}
-        _Texture ("tex", 2D) = "white" {}
         baseColor("base-color", Vector) = (0.99,0.0,0.3,0.0)
-        xRad("xRad", float) = 0.0
         seperation("seperation", float) = 0.0
         totalSize("totalSize", float) = 0.0
         _MaxHeight("max height", float) = 0.0
-        zRad("zRad", float) = 0.0//to do --use to implement oval pots
-        center("center", Vector) = (0.0,0.0,0.0,0.0)//center of pot water
-        _LightPos("light-position", Vector) = (0.0,0.0,0.0,0.0)
-
 
         [HDR]
         _AmbientColor("Ambient Color", Color) = (0.0,0.0,0.0,1.0)
@@ -39,14 +31,15 @@ Shader "Unlit/water"
         Pass
         {
             CGPROGRAM
+
             #pragma vertex vert
             #pragma fragment frag
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "cellShading.cginc"
-            #pragma multi_compile_fwdadd_fullshadows
 
+            #pragma multi_compile_fwdadd_fullshadows
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -69,27 +62,18 @@ Shader "Unlit/water"
                 float3 worldNormal : NORMAL;
                 float3 viewDir : TEXCOORD3;
                 float4 pos : TEXCOORD4;
-                SHADOW_COORDS(5)
             };
 
             sampler2D _Tex;
             float4 _Tex_ST;
-
-            sampler2D _Texture;
-            float4 _Texture_ST;
 
             sampler2D _RenderTex;
             float4 _RenderTex_ST;
 
             uniform float seperation;
             uniform float totalSize;
-            uniform float xRad;
-            uniform float zRad;
-            uniform float _MaxHeight;
-
-            uniform float4 center;
+            uniform float _MaxHeight; 
             uniform float4 baseColor;
-            uniform float4 _LightPos;
 
             float _Glossiness;
             float4 _SpecularColor;
@@ -161,35 +145,7 @@ Shader "Unlit/water"
                 o.wpos = worldPos;
 				o.screenPos = ComputeScreenPos(o.vertex);
                 o.viewDir = WorldSpaceViewDir(v.vertex);
-                TRANSFER_SHADOW(o);
                 return o;
-            }
-
-            float getAlpha (v2f i)
-            {
-                //get the distance between this fragment and this center of the pot
-                float worldCenterDistance = length(i.wpos.xz - center.xz);
-                //t is a constant we need to calculate to get the equation
-                //fot the vector that goes from the camera to the fragment
-                float t = (center.y - _WorldSpaceCameraPos.y) / (i.wpos.y - _WorldSpaceCameraPos.y);
-                //use this constant to calculate the intercept between a vector going from the center to the
-                //pot to the vector going from the camera to the fragment
-                float x = _WorldSpaceCameraPos.x + t*(i.wpos.x - _WorldSpaceCameraPos.x);
-                float z = _WorldSpaceCameraPos.z + t*(i.wpos.z - _WorldSpaceCameraPos.z);
-                float3 intercept = float3(x, center.y,z);
-                float3 centerToIntercept = center.xyz - intercept;
-                //get the distance for this vector
-                //distance the fragmant is from the center of the circle
-                float distFromCenter = length(centerToIntercept);
-                //declare our alpha value so by default the texture is opaque
-                float alpha = 1.0;
-                //if the distance from the center to the camera vector is greater than the radius
-                //of the circle, make the fragmant invisible.
-                //TODO condider oval shapes (use zRadius)
-                if (distFromCenter > xRad){
-                    alpha = 0.0;
-                }
-                return alpha;
             }
 
             fixed4 frag (v2f i) : SV_Target
@@ -197,15 +153,12 @@ Shader "Unlit/water"
                 // sample the texture
                 fixed4 col = baseColor;
                 //check to see if we should render this fragment (if its inside the pot)
-                float alpha = getAlpha(i);
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, baseColor, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
                 //render the render texure relative to screen position
                 fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y + i.pos.y/1.5+0.3)/i.screenPos.w);
 
-                fixed shadow = SHADOW_ATTENUATION(i);
-                col = col*shading - tex * clamp(1.0 - tex.a,0.0,1.0) * 0.4;
-                col.a = alpha;
-                return  col * shadow;
+                col = col - tex * clamp(1.0 - tex.a,0.0,1.0) * 0.4;
+                return  col;
             }
             ENDCG
         }
@@ -279,6 +232,7 @@ Shader "Unlit/water"
 
 			ENDCG
 		}
+
 
     }
 }
