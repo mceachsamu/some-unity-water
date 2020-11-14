@@ -4,7 +4,7 @@
     {
         _Tex ("Texture", 2D) = "white" {}//the main texture-- used as the height map
         _RenderTex ("RenderTexture", 2D) = "white" {}
-        baseColor("base-color", Vector) = (0.99,0.0,0.3,0.0)
+        _BaseColor("base-color", Vector) = (0.99,0.0,0.3,0.0)
         seperation("seperation", float) = 0.0
         totalSize("totalSize", float) = 0.0
         _MaxHeight("max height", float) = 0.0
@@ -21,8 +21,7 @@
     {
 
         Blend One One
-        Tags {"RenderType"="Opaque"
-            "LightMode"="ForwardAdd" }
+        Tags {"RenderType"="Opaque" "LightMode"="ForwardAdd" }
         Lighting On
         LOD 200
         ZWrite Off
@@ -73,7 +72,7 @@
             uniform float seperation;
             uniform float totalSize;
             uniform float _MaxHeight; 
-            uniform float4 baseColor;
+            uniform float4 _BaseColor;
 
             float _Glossiness;
             float4 _SpecularColor;
@@ -91,14 +90,14 @@
 
                     float4 topLeft = tex2Dlod (_Tex, float4(float2(v.uv.x - v.texStep,v.uv.y + v.texStep),0,0));
 
-                    float4 vec1 =  float4(-v.step,topLeft.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0);
-                    float4 vec2 =  float4(v.step,topRight.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0);
+                    float4 vec1 =  (float4(-v.step,topLeft.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0));
+                    float4 vec2 =  (float4(v.step,topRight.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0));
 
-                    float4 vec3 =  float4(-v.step,topLeft.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0);
-                    float4 vec4 =  float4(v.step,botRight.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0);
+                    float4 vec3 =  (float4(-v.step,botLeft.r, -v.step,0) - float4(-v.step,topLeft.r,v.step,0));
+                    float4 vec4 =  (float4(-v.step,botLeft.r, -v.step,0) - float4(v.step,botRight.r,v.step,0));
 
-                    float3 norm1 = normalize(cross(vec1,vec2));
-                    float3 norm2 = normalize(cross(vec3,vec4));
+                    float3 norm1 = normalize(cross(vec2,vec1));
+                    float3 norm2 = normalize(cross(vec4,vec3));
                     return (norm1 + norm2)/ 2.0;
             }
 
@@ -120,8 +119,12 @@
 
                     normcalc n;
                     n.texStep = seperation / totalSize;
-                    n.step = n.texStep;
+                    n.step = (0.5 / 50)*3;
 
+                    n.uv = float2(v.uv.x, v.uv.y);
+                    float3 norm = getNormal(n);
+
+                    //calculate neighbour normals
                     n.uv = float2(v.uv.x + n.step, v.uv.y);
                     float3 norm1 = getNormal(n);
 
@@ -134,7 +137,7 @@
                     n.uv = float2(v.uv.x, v.uv.y - n.step);
                     float3 norm4 = getNormal(n);
 
-                    o.worldNormal = (norm1 + norm2 + norm3 + norm4)/4.0;
+                    o.worldNormal = (norm + norm1 + norm2 + norm3 + norm4)/5.0;
                 #endif
 
                 o.pos = v.vertex;
@@ -151,13 +154,13 @@
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = baseColor;
+                fixed4 col = tex2D(_Tex, i.uv);
                 //check to see if we should render this fragment (if its inside the pot)
-                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, baseColor, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
+                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, _BaseColor, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
                 //render the render texure relative to screen position
-                fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y + i.pos.y/1.5+0.3)/i.screenPos.w);
-
-                col = col - tex * clamp(1.0 - tex.a,0.0,1.0) * 0.4;
+                fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y + i.pos.y/2)/i.screenPos.w);
+                
+                //col = col * shading;// + tex/10;
                 return  col;
             }
             ENDCG

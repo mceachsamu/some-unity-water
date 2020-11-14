@@ -33,7 +33,6 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
     float rimIntensity = smoothstep(_RimAmount - 0.01, _RimAmount + 0.01, rimDot);
     float4 rim = rimIntensity * _RimColor;
 
-
     //reduce overall shading when light source is further away
     float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),0.5));
     if (lightPos.w == 0) {
@@ -43,6 +42,6 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
     float4 finalColor = (baseColor + overall + specular + rim) * dist;
     //we arent using the alpha channel for our final shading, so pass
     //through the NdotL value so we can use it for calculating underwater distortion
-    finalColor.a = NdotL;
-    return NdotH;
+    //finalColor.a = NdotL;
+    return finalColor;
 }

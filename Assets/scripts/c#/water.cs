@@ -51,6 +51,30 @@ public class water : MonoBehaviour
 
     private float angleDiff = 0.0f;
 
+    public GameObject light;
+
+    private int count = 0;
+
+
+
+        private Color blue = Color.blue;
+        private int center = 50 / 2;
+        private int iD = 1;
+        private int iGoal = 1;
+        private int i = 0;
+        private int count2 = 0;
+        private int iIters = 0;
+
+        private int jD = 0;
+        private int jGoal = -1;
+        private int j = 0;
+        private int jIters = 0;
+
+        private int iIncrease = 0;
+        private int jIncrease = 0;
+        private int iIncD = 0;
+        private int jIncD = 0;
+
     void Start()
     {
         Application.targetFrameRate = 60;
@@ -70,14 +94,53 @@ public class water : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        count++;
 
-        this.AddForceToWater(this.transform.position, 100.0f);
+        if (count % 1 == 0){
+            this.AddForceToWater(this.transform.position, 100f);
+        }
+
         //this loop applies the physics model for each point in our field an updates the heightmap accordingly
-        for (int i = 0; i < numFieldPoints;i++){
-            for (int j = 0; j < numFieldPoints;j++){
-                pointField[i,j].move();
-                heightMap.SetPixel(i,j, pointField[i,j].GetHeightValue());
+        // for (int i = 0; i < numFieldPoints;i++){
+        //     for (int j = 0; j < numFieldPoints;j++){
+        //         pointField[i,j].move();
+        //         heightMap.SetPixel(i,j, pointField[i,j].GetHeightValue());
+        //     }
+        // }
+        if (i < numFieldPoints/2 && count % 1 == 0){
+            int indexi = center + i;
+            int indexj = center + j;
+            if (i == iGoal){
+                jD = iD * -1;
+                iD = 0;
+                iGoal = i + ((2 + iIncrease + iIters) * jD);
+                iIters++;
+                iIncrease+=iIncD;
+                if (iIters % 3 == 0){
+                    iIncD++;
+                }
+            }else if (j == jGoal){
+                iD = jD;
+                jD = 0;
+                jGoal = j + ((2 + jIncrease + jIters) * iD * -1);
+                jIters++;
+                jIncrease+=jIncD;
+                if (jIters % 3 == 0){
+                    jIncD++;
+                }
             }
+
+            pointField[indexi,indexj].move();
+            for (int n = 0; n <= jIncD; n++){
+                heightMap.SetPixel(indexi-n,indexj-n, pointField[indexi,indexj].GetHeightValue());
+                //heightMap.SetPixel(indexi-n,indexj-n, blue);
+            }
+            
+            
+        }
+        if (count % 1 == 0){
+            i += iD;
+            j += jD;
         }
         heightMap.Apply();
 
@@ -91,7 +154,8 @@ public class water : MonoBehaviour
         this.GetComponent<Renderer>().material.SetFloat("_MaxHeight", maxHeight);
 
         this.GetComponent<Renderer>().material.SetTexture("_Tex", heightMap);
-        this.GetComponent<Renderer>().material.SetVector("baseColor", primaryCol);
+        this.GetComponent<Renderer>().material.SetVector("_BaseColor", primaryCol);
+        this.GetComponent<Renderer>().material.SetVector("_LightDir", light.transform.position);
     }
 
     public void AddForceToWater(Vector3 position, float forceAmount){

@@ -98,14 +98,12 @@
                 //get shading
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, i.worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
 
-                col = shading;
-
                 float2 waterUV = getWaterUV(i);
                 float waterHeight = tex2D(_HeightMap, waterUV);
 
                 float waterLevel = waterHeight + _WaterLevel - _MaxHeight;
 
-                col = col * pow(shading,0.4);
+                col = col;// * pow(shading,0.4);
 
                 if (i.wpos.y < waterLevel+0.05){
                     col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),0.5) * _WaterOpaqueness);
