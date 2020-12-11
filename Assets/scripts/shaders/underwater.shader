@@ -104,7 +104,7 @@
 
                 float dist = (0.1 / pow(length(i.wpos - _WorldSpaceCameraPos),0.9)) * 0.8;
 
-                fixed4 col = tex2D(_MainTex, i.uv*30.0 + noise/10.0);
+                fixed4 col = tex2D(_MainTex, i.uv*50.0 + noise/30.0);
                 //get shading
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, i.worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
 

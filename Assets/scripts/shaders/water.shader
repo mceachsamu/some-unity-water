@@ -166,7 +166,7 @@
                 col = _BaseColor * shading ;// - tex / dist;
                 col.a = 1.0;
 
-                float4 bias = ((tex/2.0 + col/5.0)/2.0) * dist;
+                float4 bias = ((tex/2.0 + col/2.0)/2.0) * dist;
                 //col.rb *= dist;
                 bias.a = 1.0;
                 return bias;

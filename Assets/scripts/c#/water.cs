@@ -94,7 +94,6 @@ public class water : MonoBehaviour
                     heightMap.SetPixel(i, j, pointField[i,j].GetHeightValue());
                 }
             }
-
         heightMap.Apply();
         }
 

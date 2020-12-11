@@ -103,7 +103,7 @@
                     worldNormal = i.worldNormal;
                 }
 
-                fixed4 col = tex2D(_MainTex, i.uv*30.0);
+                fixed4 col = tex2D(_MainTex, i.uv*50.0);
                 fixed4 paint = tex2D(_PaintTexture, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
                 //apply saturation
                 col.rgb = col.rgb * _Saturation;
