@@ -17,7 +17,7 @@ public class camerScript : MonoBehaviour
     {
         Vector3 pos = Player.transform.position;
         pos -= Player.transform.forward * 15.0f;
-        pos.y += 2.0f;
+        pos.y += 4.0f;
         this.transform.position = pos;
         this.transform.forward = ( Player.transform.position - this.transform.position);
     }

@@ -34,16 +34,16 @@ public class player : MonoBehaviour
             this.transform.RotateAround(this.transform.position, Vector3.up, -rotateRate);
         }
         if (Input.GetKey("w")){
-            Legs.GetComponent<playerLegs>().AddForce(this.transform.forward * 5.0f);
+            Legs.GetComponent<playerLegs>().AddForce(this.transform.forward * force);
         }
         if (Input.GetKey("s")){
-            Legs.GetComponent<playerLegs>().AddForce(this.transform.forward * -5.0f);
+            Legs.GetComponent<playerLegs>().AddForce(this.transform.forward * -force);
         }
         if (Input.GetKey("a")){
-            Legs.GetComponent<playerLegs>().AddForce(this.transform.right * -5.0f);
+            Legs.GetComponent<playerLegs>().AddForce(this.transform.right * -force);
         }
         if (Input.GetKey("d")){
-            Legs.GetComponent<playerLegs>().AddForce(this.transform.right * 5.0f);
+            Legs.GetComponent<playerLegs>().AddForce(this.transform.right * force);
         }
 
         float height = water.GetComponent<water>().getHeightAtPosition(this.transform.position);
@@ -68,11 +68,7 @@ public class player : MonoBehaviour
                 Vector3 posC = this.transform.position + BackwardsVelocity * i;
                 float forceC = force / (i+1.0f);
                 water.GetComponent<water>().AddForceToWater(posC, forceC);
-            }
-
-                // water.GetComponent<water>().AddForceToWater(this.transform.position + BackwardsVelocity, 10.0f);
-        }
-        Debug.DrawLine(this.transform.position, this.transform.position - GetVelocity(), Color.red);
+            }}
 }
     public Vector3 GetVelocity(){
         return Legs.GetComponent<Rigidbody>().velocity;

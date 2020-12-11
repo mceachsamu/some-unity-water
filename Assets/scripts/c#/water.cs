@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Reflection;
 public class water : MonoBehaviour
 {
+    public bool moves;
     //the number of segments the plane is made up from
     public int numSegs = 10;
     //the size of the segments on the plane generated
@@ -78,14 +79,7 @@ public class water : MonoBehaviour
     {
         count++;
 
-        bool move = true;
-        if (player.transform.position.x > this.transform.position.x + (numSegs * segSize)/2.0f
-        || player.transform.position.x <  this.transform.position.x - (numSegs * segSize)/2.0f
-        || player.transform.position.z > this.transform.position.z + (numSegs * segSize)/2.0
-        || player.transform.position.z < this.transform.position.z - (numSegs * segSize)/2.0){
-            move = false;
-        }
-        if (move){
+        if (moves){
             //this loop applies the physics model for each point in our field an updates the heightmap accordingly
             for (int i = 0; i < numFieldPoints;i++){
                 for (int j = 0; j < numFieldPoints;j++){
@@ -100,8 +94,9 @@ public class water : MonoBehaviour
                     heightMap.SetPixel(i, j, pointField[i,j].GetHeightValue());
                 }
             }
-        }
+
         heightMap.Apply();
+        }
 
         setShaderProperties();
     }
