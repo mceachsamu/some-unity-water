@@ -4,8 +4,10 @@
     {
         _MainTex("Texture", 2D) = "white" {}
         _HeightMap("heightmap", 2D) = "white" {}
+        _NoiseMap("noise map", 2D) = "white" {}
         _MaxHeight("max height", float) = 0.0
         _WaterSize("water size", float) = 0.0
+        _Count("counter", float) = 0.0
         _WaterOpaqueness("water opaqueness", float) = 0.0
         _WaterLevel("water level", float) = 0.0
         _CullAboveWater("cull above water", int) = 0
@@ -59,12 +61,17 @@
             sampler2D _HeightMap;
             float4 _HeightMap_ST;
 
+            sampler2D _NoiseMap;
+            float4 _NoiseMap_ST;
+
             uniform float _WaterSize;
             uniform float _MaxHeight;
             uniform float _WaterOpaqueness;
             uniform float _WaterLevel;
 
             uniform float4 _Center;
+
+            uniform float _Count;
 
             float _Glossiness;
             float4 _SpecularColor;
@@ -93,8 +100,11 @@
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 noise = tex2D(_NoiseMap, i.uv*6.0 + _Count/1500.0);
 
+                float dist = (0.1 / pow(length(i.wpos - _WorldSpaceCameraPos),0.9)) * 0.8;
+
+                fixed4 col = tex2D(_MainTex, i.uv*30.0 + noise/10.0);
                 //get shading
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, i.worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
 
@@ -103,7 +113,6 @@
 
                 float waterLevel = waterHeight + _WaterLevel - _MaxHeight;
 
-                col = col;// * pow(shading,0.4);
 
                 if (i.wpos.y < waterLevel+0.05){
                     col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),0.5) * _WaterOpaqueness);
@@ -113,7 +122,7 @@
                     col.a = 0.0;
                 }
 
-                return col;
+                return col;// * shading;
             }
             ENDCG
         }

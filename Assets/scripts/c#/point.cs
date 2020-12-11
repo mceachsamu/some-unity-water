@@ -23,6 +23,9 @@ public class point
 
     public float speed = 0.0f;
 
+    public float spacingX = 1.0f;
+    public float spacingY = 1.0f;
+
 
     //initialize our point
     public point(water waterObj, float y){
@@ -58,6 +61,11 @@ public class point
         float height =  ((this.y + water.maxHeight))/(water.maxHeight*2.0f);
         return new Vector4(height,height,height,1.0f);
     }
+
+    public void SetHeightValue(float newHeight){
+        this.y = newHeight;
+    }
+
     public void addForce(float force){
         this.acceleration += force/water.mass;
     }

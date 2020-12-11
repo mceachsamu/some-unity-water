@@ -156,12 +156,20 @@
                 // sample the texture
                 fixed4 col = tex2D(_Tex, i.uv);
                 //check to see if we should render this fragment (if its inside the pot)
-                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, _BaseColor, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
+                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, _BaseColor, _BaseColor, _SpecularColor, _RimAmount, _Glossiness);
                 //render the render texure relative to screen position
-                fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y + i.pos.y/2)/i.screenPos.w);
-                
-                //col = col * shading;// + tex/10;
-                return  col;
+                fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y - i.wpos.y/4.0)/i.screenPos.w);
+
+                float dist =  ( pow(length(i.wpos - _WorldSpaceCameraPos),0.3)) / 3.0;
+
+
+                col = _BaseColor * shading ;// - tex / dist;
+                col.a = 1.0;
+
+                float4 bias = ((tex/4.0 + col/10.0)/1.0) * dist;
+                //col.rb *= dist;
+                bias.a = 1.0;
+                return bias;
             }
             ENDCG
         }

@@ -6,6 +6,8 @@ public class underwater : MonoBehaviour
 {
     public GameObject water;
 
+    private float count = 0.0f;
+
     //if true, will not render fragments above water surface
     public int cullAboveWater = 1;
 
@@ -21,6 +23,7 @@ public class underwater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        count++;
         setShaderProperties();
     }
 
@@ -31,6 +34,7 @@ public class underwater : MonoBehaviour
         this.GetComponent<Renderer>().material.SetFloat("_WaterLevel", water.GetComponent<Transform>().position.y);
         this.GetComponent<Renderer>().material.SetFloat("_MaxHeight", water.GetComponent<water>().maxHeight);
         this.GetComponent<Renderer>().material.SetInt("_CullAboveWater", cullAboveWater);
+        this.GetComponent<Renderer>().material.SetFloat("_Count", count);
     }
 
 }
