@@ -33,8 +33,42 @@ public class player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        print(water.GetComponent<water>().getHeightAtPosition(water.transform.position));
         this.transform.position = Legs.transform.position;
+        ActOnInput();
+        float height = water.GetComponent<water>().getHeightAtPosition(this.transform.position);
+        if (this.transform.position.y-1.3f < height){
+            Legs.GetComponent<playerLegs>().AddForce(Vector3.up*buoyancey);
+        }
+        water w = water.GetComponent<water>();
+        Vector3 pos = w.transform.position;
+        pos.x = this.transform.position.x;
+        pos.z = this.transform.position.z;
+        water.transform.position = pos;
+
+        AddWaterRipples();
+
+    }
+
+    public void AddWaterRipples(){
+
+
+        float height = water.GetComponent<water>().getHeightAtPosition(this.transform.position);
+        Vector3 BackwardsVelocity = (GetVelocity())*-1.0f;
+
+        //dont care about y velocity
+        BackwardsVelocity.y = this.transform.position.y;
+        BackwardsVelocity = BackwardsVelocity / forceDivisions;
+        if (this.transform.position.y-1.5f < height){
+            //touching water, so add force
+            for(float i = 0.0f; i < forceDivisions; i++){
+                Vector3 posC = this.transform.position + BackwardsVelocity * i;
+                float forceC = (force / Mathf.Pow(i+1.0f,5.0f)) * Mathf.Pow(GetVelocity().magnitude/5.0f,2.0f) / 20.0f;
+                water.GetComponent<water>().AddForceToWater(posC, forceC);
+            }
+        }
+    }
+
+    public void ActOnInput(){
         if (Input.GetKey(KeyCode.RightArrow)){
         }
         if (Input.GetKey(KeyCode.LeftArrow)){
@@ -69,31 +103,8 @@ public class player : MonoBehaviour
         this.transform.RotateAround(this.transform.position, new Vector3(1.0f,0.0f,0.0f), zRot);
         this.transform.RotateAround(this.transform.position, new Vector3(0.0f,1.0f,0.0f), yRot);
 
-        float height = water.GetComponent<water>().getHeightAtPosition(this.transform.position);
-        if (this.transform.position.y-1.3f < height){
-            Legs.GetComponent<playerLegs>().AddForce(Vector3.up*buoyancey);
-        }
+    }
 
-        water w = water.GetComponent<water>();
-        Vector3 pos = w.transform.position;
-        pos.x = this.transform.position.x;
-        pos.z = this.transform.position.z;
-        water.transform.position = pos;
-
-        Vector3 BackwardsVelocity = (GetVelocity())*-1.0f;
-
-        //dont care about y velocity
-        BackwardsVelocity.y = this.transform.position.y;
-        BackwardsVelocity = BackwardsVelocity / forceDivisions;
-        if (this.transform.position.y-1.5f < height){
-            //touching water, so add force
-            for(float i = 0.0f; i < forceDivisions; i++){
-                Vector3 posC = this.transform.position + BackwardsVelocity * i;
-                float forceC = (force / Mathf.Pow(i+1.0f,5.0f)) * GetVelocity().magnitude / 10.0f;
-                water.GetComponent<water>().AddForceToWater(posC, forceC);
-            }
-        }
-}
     public Vector3 GetVelocity(){
         return Legs.GetComponent<Rigidbody>().velocity;
     }

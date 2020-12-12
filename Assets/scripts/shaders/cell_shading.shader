@@ -73,7 +73,7 @@
                 o.worldNormal =  UnityObjectToWorldNormal(v.normal);
                 o.wpos = mul(unity_ObjectToWorld, v.vertex);
                 o.viewDir = WorldSpaceViewDir(v.vertex);
-				o.screenPos = ComputeScreenPos(o.vertex);   
+				o.screenPos = ComputeScreenPos(o.vertex);
 
                 half3 wTangent = UnityObjectToWorldDir(v.tangent.xyz);
                 // compute bitangent from cross product of normal and tangent
@@ -91,7 +91,7 @@
             {
                 half2 uv_NormalMap = TRANSFORM_TEX (i.uv, _NormalMap);
 
-                half3 tnormal = UnpackNormal(tex2D(_NormalMap, uv_NormalMap));
+                half3 tnormal = UnpackNormal(tex2D(_NormalMap, uv_NormalMap * 10.0));
                  // transform normal from tangent to world space
                 half3 worldNormal;
                 worldNormal.x = dot(i.tspace0, tnormal);
@@ -103,17 +103,19 @@
                     worldNormal = i.worldNormal;
                 }
 
-                fixed4 col = tex2D(_MainTex, i.uv*50.0);
+                fixed4 col = tex2D(_MainTex, i.uv*20.0);
                 fixed4 paint = tex2D(_PaintTexture, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
                 //apply saturation
                 col.rgb = col.rgb * _Saturation;
 
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
+                float4 lightDir = _WorldSpaceLightPos0 - i.wpos;
+                float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),0.3))/4.0;
 
                 float shadow = SHADOW_ATTENUATION(i);
                 //fixed4 c = atten;
                 col.xyz *= shadow;
-                return col * shading;
+                return col * shading * dist;
             }
             ENDCG
         }

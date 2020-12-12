@@ -32,7 +32,7 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
     float4 rim = rimIntensity * _RimColor;
 
     //reduce overall shading when light source is further away
-    float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),0.3))*10.0;
+    float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),0.2))*20.0;
     if (lightPos.w == 0) {
         //dont use distance decay on directional light
         dist = 1.0;

@@ -54,7 +54,7 @@ public class water : MonoBehaviour
 
     public GameObject player;
 
-
+    public GameObject Water;
     private int count = 0;
 
     void Start()
@@ -77,6 +77,9 @@ public class water : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Water != null){
+            this.primaryCol = Water.GetComponent<water>().primaryCol;
+        }
         count++;
 
         if (moves){

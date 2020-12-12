@@ -6,18 +6,30 @@ public class lightController : MonoBehaviour
 {
 
     public GameObject player;
+
+    private float[] sequence = new float[]{0.00004f,0.00007f,0.00003f,0.00005f,0.00006f,-0.00003f,0.00004f};
+    private int counter;
+    private int counter2;
+    private float origin;
     // Start is called before the first frame update
     void Start()
     {
-        
+        origin = this.transform.position.y;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 pos = player.transform.position;
-        pos.y += 10.0f;
-        pos.z += 5.0f;
+        counter2++;
+        Vector3 pos = this.transform.position;
+        pos.y += sequence[counter];
+        if (counter2 % 1 == 0){
+            counter++;
+        }
+        if (counter >= sequence.Length){
+            pos.y = origin;
+            counter = 0;
+        }
         this.transform.position = pos;
     }
 }

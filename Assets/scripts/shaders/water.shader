@@ -169,13 +169,13 @@
                 //render the render texure relative to screen position
                 fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
 
-                float dist = ( pow(length(i.wpos - _WorldSpaceCameraPos),0.5)) * 5.0;
+                float dist = ( pow(length(i.wpos - _WorldSpaceCameraPos),1.5)) *1.0;
 
 
                 col = _BaseColor * shading *shading;// - tex / dist;
                 col.a = 1.0;
 
-                float4 bias = ((tex*5.0 + col/5.0)/2.0)/dist;
+                float4 bias = ((-tex*8.0 + col/5.0)/2.0)/dist;
                 //col.rb *= dist;
                 bias.a = 1.0;
                 return bias;
