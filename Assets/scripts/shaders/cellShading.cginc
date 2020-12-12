@@ -9,21 +9,21 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
     }
 
     float NdotL = dot(wNorm , lightDir);
-    float intensity =  smoothstep(0.5, 1.0, NdotL);
+    float intensity = NdotL/3.0;
     float overall = intensity;
     //use hard cuttoffs so we get cell effect
     if (overall < 0.0){
         overall = 0.5;
     }
     if (overall > 0.0){
-        overall = 1.0;
+        overall = 1.5;
     }
     //calculate the specular intensity
     float3 H = normalize(lightPos + viewDir);
     float NdotH = dot(wNorm, H);
-    float specIntensity = pow(NdotH * intensity, _Glossiness * _Glossiness);
+    float specIntensity = pow(NdotH * intensity, _Glossiness);
 
-    float specularIntensitySmooth = smoothstep(0.0, 0.1, specIntensity);
+    float specularIntensitySmooth = smoothstep(0.0,1.3, specIntensity);
     float4 specular = specularIntensitySmooth * _SpecularColor;
 
     //calculate the rim intentity
@@ -37,6 +37,7 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
         //dont use distance decay on directional light
         dist = 1.0;
     }
+
     float4 finalColor = (overall + specular + rim)*dist;
     //we arent using the alpha channel for our final shading, so pass
     //through the NdotL value so we can use it for calculating underwater distortion

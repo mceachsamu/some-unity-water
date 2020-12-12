@@ -4,6 +4,7 @@
     {
         _Tex ("Texture", 2D) = "white" {}//the main texture-- used as the height map
         _RenderTex ("RenderTexture", 2D) = "white" {}
+        _NoiseMap ("noise map", 2D) = "white" {}
         _BaseColor("base-color", Vector) = (0.99,0.0,0.3,0.0)
         seperation("seperation", float) = 0.0
         totalSize("totalSize", float) = 0.0
@@ -69,9 +70,12 @@
             sampler2D _RenderTex;
             float4 _RenderTex_ST;
 
+            sampler2D _NoiseMap;
+            float _NoiseMap_ST;
+
             uniform float seperation;
             uniform float totalSize;
-            uniform float _MaxHeight; 
+            uniform float _MaxHeight;
             uniform float4 _BaseColor;
 
             float _Glossiness;
@@ -111,11 +115,12 @@
                 //get world position from object position
                 float4 worldPos = mul (unity_ObjectToWorld, v.vertex);
                 o.wpos = worldPos;
-
+                
                 // sample the texture
                 #if !defined(SHADER_API_OPENGL)
                     float4 height = tex2Dlod (_Tex, float4(float2(v.uv.x,v.uv.y),0,0));
-                    v.vertex.y += height.r - _MaxHeight;
+                    float noise = tex2Dlod (_NoiseMap, float4(float2(v.uv.x,v.uv.y),0,0));
+                    v.vertex.y += height.r * 2.0 - _MaxHeight;
 
                     normcalc n;
                     n.texStep = seperation / totalSize;
@@ -138,12 +143,16 @@
                     float3 norm4 = getNormal(n);
 
                     o.worldNormal = (norm + norm1 + norm2 + norm3 + norm4)/5.0;
+
+
                 #endif
+                worldPos = mul (unity_ObjectToWorld, v.vertex);
+                v.vertex.y += sin(worldPos.x / 10.0 - worldPos.z / 5.0)/5.0 + sin(worldPos.z / 15.0 + worldPos.x / 10.0)/4.0;
+                worldPos = mul (unity_ObjectToWorld, v.vertex);
 
                 o.pos = v.vertex;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _Tex);
-                worldPos = mul (unity_ObjectToWorld, v.vertex);
                 worldPos.y = worldPos.y;
                 o.wpos = worldPos;
 				o.screenPos = ComputeScreenPos(o.vertex);
@@ -160,13 +169,13 @@
                 //render the render texure relative to screen position
                 fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
 
-                float dist =  ( pow(length(i.wpos - _WorldSpaceCameraPos),0.3)) / 3.0;
+                float dist = ( pow(length(i.wpos - _WorldSpaceCameraPos),0.5)) * 5.0;
 
 
-                col = _BaseColor * shading ;// - tex / dist;
+                col = _BaseColor * shading *shading;// - tex / dist;
                 col.a = 1.0;
 
-                float4 bias = ((tex/2.0 + col/2.0)/2.0) * dist;
+                float4 bias = ((tex*5.0 + col/5.0)/2.0)/dist;
                 //col.rb *= dist;
                 bias.a = 1.0;
                 return bias;

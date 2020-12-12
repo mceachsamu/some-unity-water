@@ -16,7 +16,8 @@ public class lightController : MonoBehaviour
     void Update()
     {
         Vector3 pos = player.transform.position;
-        pos.y += 2.0f;
+        pos.y += 10.0f;
+        pos.z += 5.0f;
         this.transform.position = pos;
     }
 }

@@ -39,7 +39,7 @@ public class water : MonoBehaviour
     [Range(0.1f, 5.0f)]
     public float maxHeight = 1.0f;
     //the mass defines the mass of each point. this effects how much points are effected by forces
-    [Range(1.0f, 10.0f)]
+    [Range(0.01f, 5.0f)]
     public float mass = 3.0f;
     //deceleration defines the rate at which each point tends to a state of rest
     [Range(-0.01f, -0.1f)]

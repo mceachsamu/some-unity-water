@@ -19,6 +19,9 @@ public class playerLegs : MonoBehaviour
     public void AddForce(Vector3 force){
         this.GetComponent<Rigidbody>().AddForce(force, ForceMode.Force);
     }
+    
+    public void AddForceAtPosition(Vector3 force, Vector3 position){
+        this.GetComponent<Rigidbody>().AddForceAtPosition(force, position, ForceMode.Force);
+    }
 
-  
 }
