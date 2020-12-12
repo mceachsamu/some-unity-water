@@ -102,7 +102,7 @@
                 // sample the texture
                 fixed4 noise = tex2D(_NoiseMap, i.uv*6.0 + _Count/1500.0);
 
-                float dist = (1.0 / pow(length(i.wpos - _WorldSpaceCameraPos),1.0)) *10 .0 ;
+                float dist = (1.0 / pow(length(i.wpos - _WorldSpaceCameraPos),1.0)) *10.0 ;
 
                 fixed4 col = tex2D(_MainTex, i.uv*50.0 + noise/30.0);
                 //get shading
