@@ -81,7 +81,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _CausticStrength: 0.006
+    - _CausticStrength: 0.1
     - _CausticsFrequency: 40
     - _CausticsNoiseDiv: 500
     - _CausticsSpeedDiv: 40000

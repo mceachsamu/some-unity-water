@@ -36,13 +36,13 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
         //directional lighting
         FragToLight = - lightPos;
     }
-    float backLighting = dot(normalize(viewDir), -normalize(lightDir));
+    float backLighting = dot(normalize(viewDir), -normalize(lightDir + wNorm * 0.1));
 
-    float4 finalColor = (overall + specular + rim);
+    float4 finalColor = (overall + specular + rim + backLighting*0.8);
     //we arent using the alpha channel for our final shading, so pass
     //through the NdotL value so we can use it for calculating underwater distortion
     //finalColor.a = NdotL;
     finalColor.a = 1.0;
 
-    return finalColor;
+    return finalColor;//finalColor;
 }

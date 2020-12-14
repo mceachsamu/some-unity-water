@@ -181,13 +181,13 @@
                 fixed4 underWaterTex = tex2D(_UnderWater, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
                 fixed4 aboveWaterTex = tex2D(_AboveWater, (float2(i.screenPos.x,i.screenPos.y)/i.screenPos.w));
 
-                float dist = ( pow(length(i.wpos - _WorldSpaceCameraPos), _LightExp)) * _LightMult;
+                float dist = clamp(( (pow(length(i.wpos - _WorldSpaceLightPos0), _LightExp)) * _LightMult),1.0,10.0);
 
 
                 col = _BaseColor * shading *shading;
                 col.a = 1.0;
 
-                float4 bias = ((-underWaterTex/2.0 + col*2 + aboveWaterTex*0.4)/1.0)/dist;
+                float4 bias = clamp(((-underWaterTex/2.0 + col*2 + aboveWaterTex*0.4)/1.0)/dist,0.0,0.5);
                 //col.rb *= dist;
                 bias.a = 1.0;
                 return bias;

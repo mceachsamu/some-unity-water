@@ -146,11 +146,6 @@ MonoBehaviour:
   water: {fileID: 999880953}
   waterController: {fileID: 1249516157}
   buoyancey: 100
---- !u!4 &16731828 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8a56e6051de184d38845abc5c5bdcefa, type: 3}
-  m_PrefabInstance: {fileID: 1175723628}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &17547645
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,12 +673,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0, z: 0.032}
-  m_LocalScale: {x: 0.00854407, y: 0.008544068, z: 0.0018458547}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -14.28, y: 3.7452886, z: -38.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 16731828}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &705507996
 MonoBehaviour:

@@ -145,7 +145,7 @@
                 float shadow = SHADOW_ATTENUATION(i);
                 //fixed4 c = atten;
                 col.xyz *= shadow;
-                return clamp((col + caustics.r*_CausticStrength) * shading,0.0,0.5)*dist;
+                return clamp((col + caustics.r*_CausticStrength) * shading*dist,0.0,0.5);
             }
             ENDCG
         }
