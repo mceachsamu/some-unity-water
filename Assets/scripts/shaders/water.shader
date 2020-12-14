@@ -3,9 +3,12 @@
     Properties
     {
         _Tex ("Texture", 2D) = "white" {}//the main texture-- used as the height map
-        _RenderTex ("RenderTexture", 2D) = "white" {}
+        _UnderWater ("under water texture", 2D) = "white" {}
+        _AboveWater ("above water texture", 2D) = "white" {}
         _NoiseMap ("noise map", 2D) = "white" {}
+
         _BaseColor("base-color", Vector) = (0.99,0.0,0.3,0.0)
+
         seperation("seperation", float) = 0.0
         totalSize("totalSize", float) = 0.0
         _MaxHeight("max height", float) = 0.0
@@ -17,6 +20,9 @@
 
         _RimColor("Rim Color", Color) = (1,1,1,1)
         _RimAmount("Rim Amount", Range(0, 1)) = 1.0
+
+        _LightExp("light distance exponential", range(0, 5)) = 0.5
+        _LightMult("light distance multiplier", range(0, 20)) = 8
     }
     SubShader
     {
@@ -67,8 +73,11 @@
             sampler2D _Tex;
             float4 _Tex_ST;
 
-            sampler2D _RenderTex;
-            float4 _RenderTex_ST;
+            sampler2D _UnderWater;
+            float4 _UnderWater_ST;
+
+            sampler2D _AboveWater;
+            float4 _AboveWater_ST;
 
             sampler2D _NoiseMap;
             float _NoiseMap_ST;
@@ -78,11 +87,13 @@
             uniform float _MaxHeight;
             uniform float4 _BaseColor;
 
-            float _Glossiness;
-            float4 _SpecularColor;
-            float4 _RimColor;
-            float _RimAmount;
-            float4 _AmbientColor;
+            uniform float _Glossiness;
+            uniform float4 _SpecularColor;
+            uniform float4 _RimColor;
+            uniform float _RimAmount;
+            uniform float4 _AmbientColor;
+            uniform float _LightExp;
+            uniform float _LightMult;
 
             float3 getNormal(normcalc v)
             {
@@ -115,7 +126,7 @@
                 //get world position from object position
                 float4 worldPos = mul (unity_ObjectToWorld, v.vertex);
                 o.wpos = worldPos;
-                
+
                 // sample the texture
                 #if !defined(SHADER_API_OPENGL)
                     float4 height = tex2Dlod (_Tex, float4(float2(v.uv.x,v.uv.y),0,0));
@@ -167,15 +178,16 @@
                 //check to see if we should render this fragment (if its inside the pot)
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, _BaseColor, _BaseColor, _SpecularColor, _RimAmount, _Glossiness);
                 //render the render texure relative to screen position
-                fixed4 tex = tex2D(_RenderTex, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
+                fixed4 underWaterTex = tex2D(_UnderWater, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
+                fixed4 aboveWaterTex = tex2D(_AboveWater, (float2(i.screenPos.x,i.screenPos.y)/i.screenPos.w));
 
-                float dist = ( pow(length(i.wpos - _WorldSpaceCameraPos),1.5)) *1.0;
+                float dist = ( pow(length(i.wpos - _WorldSpaceCameraPos), _LightExp)) * _LightMult;
 
 
-                col = _BaseColor * shading *shading;// - tex / dist;
+                col = _BaseColor * shading *shading;
                 col.a = 1.0;
 
-                float4 bias = ((-tex*8.0 + col/5.0)/2.0)/dist;
+                float4 bias = ((-underWaterTex/2.0 + col*2 + aboveWaterTex*0.4)/1.0)/dist;
                 //col.rb *= dist;
                 bias.a = 1.0;
                 return bias;

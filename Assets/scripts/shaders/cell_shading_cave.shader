@@ -6,7 +6,16 @@
         _NoiseTexture("noise texture", 2D) = "white" {}
         _NormalMap("normal map", 2D) = "white" {}
         _CausticMap("caustics", 2D) = "white" {}
+
         _Count("count", float) = 0.0
+
+        _NoiseScrollSpeedDiv("noise scroll speed divider",float) = 30000.0
+        _NoiseScrollFrequency("noise frequency",float) = 40.0
+
+        _CausticsSpeedDiv("caustic speed divider",float) = 40000.0
+        _CausticsFrequency("caustic frequency",float) = 40.0
+        _CausticsNoiseDiv("caustic noise divider",float) = 500.0
+        _CausticStrength("caustic strength",float) = 0.006
 
         [HDR]
         _AmbientColor("Ambient Color", Color) = (0.0,0.0,0.0,1.0)
@@ -17,6 +26,8 @@
         _RimAmount("Rim Amount", Range(0, 1)) = 1.0
         _UseNormalMap("Use normal map", int) = 0.0
         _Saturation("Saturation", range(0,1)) = 1.0
+        _LightExp("light distance exponential", range(0, 5)) = 0.5
+        _LightMult("light distance multiplierr", range(0, 20)) = 8
     }
     SubShader
     {
@@ -62,15 +73,25 @@
             sampler2D _CausticMap;
             float4 _CausticMap_ST;
 
+            uniform float _NoiseScrollSpeedDiv;
+            uniform float _NoiseScrollFrequency;
+
+            uniform float _CausticsSpeedDiv;
+            uniform float _CausticsFrequency;
+            uniform float _CausticsNoiseDiv;
+            uniform float _CausticStrength;
+
             uniform int _Count;
 
-            float _Glossiness;
-            float4 _SpecularColor;
-            float4 _RimColor;
-            float _RimAmount;
-            float4 _AmbientColor;
-            int _UseNormalMap;
-            float _Saturation;
+            uniform float _Glossiness;
+            uniform float4 _SpecularColor;
+            uniform float4 _RimColor;
+            uniform float _RimAmount;
+            uniform float4 _AmbientColor;
+            uniform int _UseNormalMap;
+            uniform float _Saturation;
+            uniform float _LightExp;
+            uniform float _LightMult;
 
             v2f vert (appdata_tan v)
             {
@@ -105,26 +126,26 @@
                 worldNormal.x = dot(i.tspace0, tnormal);
                 worldNormal.y = dot(i.tspace1, tnormal);
                 worldNormal.z = dot(i.tspace2, tnormal);
-                
+
                 //check if we should disabled normal mapping
                 if (!_UseNormalMap){
                     worldNormal = i.worldNormal;
                 }
 
                 fixed4 col = tex2D(_MainTex, i.uv*20.0);
-                fixed4 noise = tex2D(_NoiseTexture, float2(i.uv.x - _Count/30000, i.uv.y - _Count/30000.0)*40);
-                fixed4 caustics = tex2D(_CausticMap, float2(i.uv.x + noise.r/500.0, i.uv.y + _Count/40000.0 + noise.r/500.0)*20);
+                fixed4 noise = tex2D(_NoiseTexture, float2(i.uv.x - _Count/_NoiseScrollSpeedDiv, i.uv.y - _Count/_NoiseScrollSpeedDiv)*_NoiseScrollFrequency);
+                fixed4 caustics = tex2D(_CausticMap, float2(i.uv.x + noise.r/_CausticsNoiseDiv, i.uv.y + _Count/_CausticsSpeedDiv + noise.r/_CausticsNoiseDiv)*_CausticsFrequency);
                 //apply saturation
-                col.rgb = col.rgb * _Saturation;
+                //col.rgb = col.rgb * _Saturation;
 
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
                 float4 lightDir = _WorldSpaceLightPos0 - i.wpos;
-                float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),0.1))/8.0;
+                float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),_LightExp))*_LightMult;
 
                 float shadow = SHADOW_ATTENUATION(i);
                 //fixed4 c = atten;
                 col.xyz *= shadow;
-                return clamp((col + caustics.r/60.0) * shading * dist,0.0,0.5);
+                return clamp((col + caustics.r*_CausticStrength) * shading,0.0,0.5)*dist;
             }
             ENDCG
         }

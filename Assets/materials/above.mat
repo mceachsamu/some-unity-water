@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: underwater
-  m_Shader: {fileID: 4800000, guid: 464ef1dfccb7244ed9a256d97f0cb6e2, type: 3}
+  m_Name: above
+  m_Shader: {fileID: 4800000, guid: 30b0b46a062cc40cfaae06857ddb294b, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -21,10 +21,6 @@ Material:
     m_TexEnvs:
     - _BumpMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Caustics:
-        m_Texture: {fileID: 2800000, guid: 923cf11e7451c43feb6aacffaad729ca, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -55,10 +51,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _NoiseMap:
-        m_Texture: {fileID: 2800000, guid: eae8c469855b24d9d823bbd4e45c161f, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -69,10 +61,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _CausticStrength: 0.006
-    - _CausticsFrequency: 40
-    - _CausticsNoiseDiv: 500
-    - _CausticsSpeedDiv: 40000
     - _Count: 0
     - _CullAboveWater: 0
     - _Cutoff: 0.5
@@ -81,14 +69,11 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HasCaustis: 0
-    - _LightExp: 0.41
-    - _LightMult: 1.6
+    - _LightExp: 0.38
+    - _LightMult: 2.2
     - _MaxHeight: 0
     - _Metallic: 0
     - _Mode: 0
-    - _NoiseScrollFrequency: 40
-    - _NoiseScrollSpeedDiv: 30000
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _RimAmount: 1
@@ -100,7 +85,6 @@ Material:
     - _WaterOpaqueness: 0
     - _WaterSize: 0
     - _ZWrite: 1
-    - adjust: 0
     m_Colors:
     - _AmbientColor: {r: 0, g: 0, b: 0, a: 1}
     - _Center: {r: 0, g: 0, b: 0, a: 0}

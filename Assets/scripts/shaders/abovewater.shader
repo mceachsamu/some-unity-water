@@ -1,20 +1,9 @@
-﻿Shader "Unlit/underwater"
+﻿Shader "Unlit/abovewater"
 {
     Properties
     {
         _MainTex("Texture", 2D) = "white" {}
         _HeightMap("heightmap", 2D) = "white" {}
-        _NoiseMap("noise map", 2D) = "white" {}
-        _Caustics("caustics", 2D) = "white" {}
-
-
-        _NoiseScrollSpeedDiv("noise scroll speed divider",float) = 30000.0
-        _NoiseScrollFrequency("noise frequency",float) = 40.0
-
-        _CausticsSpeedDiv("caustic speed divider",float) = 40000.0
-        _CausticsFrequency("caustic frequency",float) = 40.0
-        _CausticsNoiseDiv("caustic noise divider",float) = 500.0
-        _CausticStrength("caustic strength",float) = 0.006
 
         _MaxHeight("max height", float) = 0.0
         _WaterSize("water size", float) = 0.0
@@ -31,7 +20,6 @@
 
         _RimColor("Rim Color", Color) = (1,1,1,1)
         _RimAmount("Rim Amount", Range(0, 1)) = 1.0
-
 
         _LightExp("light distance exponential", range(0, 5)) = 1
         _LightMult("light distance multiplierr", range(0, 20)) = 10.0
@@ -112,6 +100,7 @@
             v2f vert (appdata v)
             {
                 v2f o;
+                v.vertex.y *= -1.6;
                 o.vertex = UnityObjectToClipPos(v.vertex);
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -143,7 +132,7 @@
                 float waterLevel = _WaterLevel - _MaxHeight+0.47;
 
 
-                if (i.wpos.y < waterLevel+0.8){
+                if (i.wpos.y < waterLevel+0.7){
                     col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),0.5) * _WaterOpaqueness);
                 }else if (_CullAboveWater == 0){
                     col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),0.5) * _WaterOpaqueness);
@@ -151,7 +140,7 @@
                     col.rgb *= 0.5;
                 }
 
-                return (col - caustics.r * _CausticStrength) * dist;;
+                return col * dist;
             }
             ENDCG
         }

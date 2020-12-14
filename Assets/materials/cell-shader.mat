@@ -81,6 +81,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
+    - _CausticStrength: 0.006
+    - _CausticsFrequency: 40
+    - _CausticsNoiseDiv: 500
+    - _CausticsSpeedDiv: 40000
     - _Count: 0
     - _CullAboveWater: 0
     - _Cutoff: 0.5
@@ -89,13 +93,17 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 51.2
     - _GlossyReflections: 1
+    - _LightExp: 0.4
+    - _LightMult: 1.6
     - _MaxHeight: 0
     - _Metallic: 0
     - _Mode: 0
+    - _NoiseScrollFrequency: 40
+    - _NoiseScrollSpeedDiv: 30000
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _RimAmount: 0.52
-    - _Saturation: 0.087
+    - _Saturation: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

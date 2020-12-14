@@ -21,9 +21,9 @@ public class lightController : MonoBehaviour
     void Update()
     {
         counter2++;
-        Vector3 pos = this.transform.position;
-        pos.y += sequence[counter];
-        if (counter2 % 1 == 0){
+        Vector3 pos = player.transform.position;
+        pos.y = sequence[counter] + origin;
+        if (counter2 % 10 == 0){
             counter++;
         }
         if (counter >= sequence.Length){
