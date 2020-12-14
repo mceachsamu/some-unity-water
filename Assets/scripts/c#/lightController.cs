@@ -20,16 +20,16 @@ public class lightController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // counter2++;
-        // Vector3 pos = player.transform.position;
-        // pos.y = sequence[counter] + origin;
-        // if (counter2 % 10 == 0){
-        //     counter++;
-        // }
-        // if (counter >= sequence.Length){
-        //     pos.y = origin;
-        //     counter = 0;
-        // }
-        // this.transform.position = pos;
+        counter2++;
+        Vector3 pos = player.transform.position;
+        pos.y = sequence[counter] + origin;
+        if (counter2 % 10 == 0){
+            counter++;
+        }
+        if (counter >= sequence.Length){
+            pos.y = origin;
+            counter = 0;
+        }
+        this.transform.position = pos;
     }
 }

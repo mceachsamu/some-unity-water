@@ -62,7 +62,7 @@ public class player : MonoBehaviour
             //touching water, so add force
             for(float i = 0.0f; i < forceDivisions; i++){
                 Vector3 posC = this.transform.position + BackwardsVelocity * i;
-                float forceC = (force / Mathf.Pow(i+1.0f,5.0f)) * Mathf.Pow(GetVelocity().magnitude/5.0f,2.0f) / 20.0f;
+                float forceC = (force / Mathf.Pow(i+1.0f,5.0f)) * Mathf.Pow(GetVelocity().magnitude/1.0f,2.0f) / 20.0f;
                 water.GetComponent<water>().AddForceToWater(posC, forceC);
             }
         }

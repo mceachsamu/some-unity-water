@@ -9,9 +9,14 @@
 
         _BaseColor("base-color", Vector) = (0.99,0.0,0.3,0.0)
 
-        seperation("seperation", float) = 0.0
-        totalSize("totalSize", float) = 0.0
+        _Seperation("_Seperation", float) = 0.0
+        _TotalSize("_TotalSize", float) = 0.0
         _MaxHeight("max height", float) = 0.0
+        _Count("count", float) = 0.0
+
+        _NoiseFrequency("noise frequency", float) = 100.0
+        _NoiseScrollDive("noise scroll dive", float) = 1000.0
+
 
         [HDR]
         _AmbientColor("Ambient Color", Color) = (0.0,0.0,0.0,1.0)
@@ -82,8 +87,8 @@
             sampler2D _NoiseMap;
             float _NoiseMap_ST;
 
-            uniform float seperation;
-            uniform float totalSize;
+            uniform float _Seperation;
+            uniform float _TotalSize;
             uniform float _MaxHeight;
             uniform float4 _BaseColor;
 
@@ -94,6 +99,9 @@
             uniform float4 _AmbientColor;
             uniform float _LightExp;
             uniform float _LightMult;
+            uniform float _Count;
+            uniform float _NoiseFrequency;
+            uniform float _NoiseScrollSpeedDiv;
 
             float3 getNormal(normcalc v)
             {
@@ -130,11 +138,11 @@
                 // sample the texture
                 #if !defined(SHADER_API_OPENGL)
                     float4 height = tex2Dlod (_Tex, float4(float2(v.uv.x,v.uv.y),0,0));
-                    float noise = tex2Dlod (_NoiseMap, float4(float2(v.uv.x,v.uv.y),0,0));
-                    v.vertex.y += height.r * 2.0 - _MaxHeight;
+                    float noise = tex2Dlod (_NoiseMap, float4(float2(o.wpos.x/100.0 + _Count/1000.0,o.wpos.z/100.0),0,0));
+                    v.vertex.y += height.r * 2.0 - _MaxHeight + noise.r /2.0;
 
                     normcalc n;
-                    n.texStep = seperation / totalSize;
+                    n.texStep = _Seperation / _TotalSize;
                     n.step = (0.5 / 50)*3;
 
                     n.uv = float2(v.uv.x, v.uv.y);
@@ -175,19 +183,23 @@
             {
                 // sample the texture
                 fixed4 col = tex2D(_Tex, i.uv);
+
+                fixed4 noise = tex2D(_NoiseMap, float2(i.wpos.x/100.0 + _Count/1000.0,i.wpos.z/100.0));
+
+                //get the noise value
+                //fixed4 col = tex2D(_NoiseMap, i.uv);
                 //check to see if we should render this fragment (if its inside the pot)
                 float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, _BaseColor, _BaseColor, _SpecularColor, _RimAmount, _Glossiness);
                 //render the render texure relative to screen position
                 fixed4 underWaterTex = tex2D(_UnderWater, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
-                fixed4 aboveWaterTex = tex2D(_AboveWater, (float2(i.screenPos.x,i.screenPos.y)/i.screenPos.w));
+                fixed4 aboveWaterTex = tex2D(_AboveWater, float2(i.screenPos.x + noise.r/2.0, i.screenPos.y + noise.r/5.0 + shading.r/10.0-0.5)/i.screenPos.w);
 
-                float dist = clamp(( (pow(length(i.wpos - _WorldSpaceLightPos0), _LightExp)) * _LightMult),1.0,10.0);
-
+                float dist = clamp(( (pow(length(i.wpos - _WorldSpaceLightPos0), _LightExp)) * _LightMult),1.0,10.0);\
 
                 col = _BaseColor * shading *shading;
                 col.a = 1.0;
 
-                float4 bias = clamp(((-underWaterTex/2.0 + col*2 + aboveWaterTex*0.4)/1.0)/dist,0.0,0.5);
+                float4 bias = clamp(((col*2 + aboveWaterTex*0.9)/1.0)/dist,0.0,0.5);
                 //col.rb *= dist;
                 bias.a = 1.0;
                 return bias;

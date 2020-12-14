@@ -7,14 +7,14 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
         lightDir = lightPos;
     }
 
-    float NdotL = smoothstep(0.0,1.0,dot(wNorm, lightDir));
+    float NdotL = smoothstep(0.0,0.2,dot(wNorm, lightDir));
     float intensity = NdotL;
     float overall = intensity;
     // use hard cuttoffs so we get cell effect
-    if (overall < 0.5){
+    if (overall < 0.2){
         overall = 0.5;
     }
-    if (overall > 0.5){
+    if (overall > 0.2){
         overall = 1.5;
     }
     //calculate the specular intensity
@@ -36,7 +36,7 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
         //directional lighting
         FragToLight = - lightPos;
     }
-    float backLighting = dot(normalize(viewDir), -normalize(lightDir + wNorm * 0.1));
+    float backLighting = dot(normalize(viewDir), -normalize(lightDir - wNorm * 0.1));
 
     float4 finalColor = (overall + specular + rim + backLighting*0.8);
     //we arent using the alpha channel for our final shading, so pass

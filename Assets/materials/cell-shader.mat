@@ -93,8 +93,8 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 51.2
     - _GlossyReflections: 1
-    - _LightExp: 0.4
-    - _LightMult: 1.6
+    - _LightExp: 0.26
+    - _LightMult: 0.9
     - _MaxHeight: 0
     - _Metallic: 0
     - _Mode: 0

@@ -133,9 +133,9 @@
 
 
                 if (i.wpos.y < waterLevel+0.7){
-                    col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),0.5) * _WaterOpaqueness);
+                    col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),1) * _WaterOpaqueness);
                 }else if (_CullAboveWater == 0){
-                    col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),0.5) * _WaterOpaqueness);
+                    col.a = (2.0 - pow(abs(i.wpos.y - _WaterLevel),1) * _WaterOpaqueness);
                 }else{
                     col.rgb *= 0.5;
                 }
