@@ -1,0 +1,64 @@
+struct waterOutput{
+    float4 vertex;
+    float3 worldNorm;
+};
+
+struct normcalc{
+    float2 uv;
+    float step;
+    float texStep;
+};
+
+inline float3 getNormal(normcalc v, sampler2D heightMap){
+        float4 botLeft = tex2Dlod (heightMap, float4(float2(v.uv.x - v.texStep, v.uv.y - v.texStep),0,0));
+
+        float4 botRight = tex2Dlod (heightMap, float4(float2(v.uv.x + v.texStep, v.uv.y - v.texStep),0,0));
+
+        float4 topRight = tex2Dlod (heightMap, float4(float2(v.uv.x + v.texStep, v.uv.y + v.texStep),0,0));
+
+        float4 topLeft = tex2Dlod (heightMap, float4(float2(v.uv.x - v.texStep, v.uv.y + v.texStep),0,0));
+
+        float4 vec1 =  (float4(-v.step,topLeft.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0));
+        float4 vec2 =  (float4(v.step,topRight.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0));
+
+        float4 vec3 =  (float4(-v.step,botLeft.r, -v.step,0) - float4(-v.step,topLeft.r,v.step,0));
+        float4 vec4 =  (float4(-v.step,botLeft.r, -v.step,0) - float4(v.step,botRight.r,v.step,0));
+
+        float3 norm1 = normalize(cross(vec2,vec1));
+        float3 norm2 = normalize(cross(vec4,vec3));
+        return (norm1 + norm2)/ 2.0;
+};
+
+inline waterOutput GetWaterDistortion(sampler2D heightMap, sampler2D noiseMap, float4 vertex, float3 wpos, float2 uv, float noiseAmplitude, float count, float seperation, float totalSize, float maxHeight){
+    waterOutput o;
+    o.vertex = vertex;
+
+        float4 height = tex2Dlod (heightMap, float4(float2(uv.x,uv.y),0,0));
+        float noise = tex2Dlod (noiseMap, float4(float2(wpos.x/100.0 + count/1000.0, wpos.z/100.0),0,0));
+        o.vertex.y += height.r - maxHeight + noise.r / noiseAmplitude;
+
+        normcalc n;
+        n.texStep = seperation / totalSize;
+        n.step = (0.5 / 50)*3;
+
+        n.uv = float2(uv.x, uv.y);
+        float3 norm = getNormal(n, heightMap);
+
+        //calculate neighbour normals
+        n.uv = float2(uv.x + n.step, uv.y);
+        float3 norm1 = getNormal(n, heightMap);
+
+        n.uv = float2(uv.x - n.step, uv.y);
+        float3 norm2 = getNormal(n, heightMap);
+
+        n.uv = float2(uv.x, uv.y + n.step);
+        float3 norm3 = getNormal(n, heightMap);
+
+        n.uv = float2(uv.x, uv.y - n.step);
+        float3 norm4 = getNormal(n, heightMap);
+
+        o.worldNorm = (norm + norm1 + norm2 + norm3 + norm4)/5.0;
+
+
+    return o;
+}

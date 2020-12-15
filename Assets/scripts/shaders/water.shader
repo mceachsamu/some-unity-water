@@ -16,6 +16,7 @@
 
         _NoiseFrequency("noise frequency", float) = 100.0
         _NoiseScrollDive("noise scroll dive", float) = 1000.0
+        _NoiseAmplitude("noise amplitude", float) = 2.0
 
 
         [HDR]
@@ -33,7 +34,7 @@
     {
 
         Blend One One
-        Tags {"RenderType"="Opaque" "LightMode"="ForwardAdd" }
+        Tags {"RenderType"="Opaque"}
         Lighting On
         LOD 200
         ZWrite Off
@@ -41,13 +42,15 @@
         ColorMask RGB
         Pass
         {
-            CGPROGRAM
+            Tags {"LightMode"="ForwardAdd"}
 
+            CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
+            #include "waterDistortion.cginc"
             #include "cellShading.cginc"
 
             #pragma multi_compile_fwdadd_fullshadows
@@ -57,12 +60,6 @@
                 float2 uv : TEXCOORD0;
             };
 
-            struct normcalc
-            {
-                float2 uv;
-                float step;
-                float texStep;
-            };
 
             struct v2f
             {
@@ -100,30 +97,10 @@
             uniform float _LightExp;
             uniform float _LightMult;
             uniform float _Count;
+
             uniform float _NoiseFrequency;
             uniform float _NoiseScrollSpeedDiv;
-
-            float3 getNormal(normcalc v)
-            {
-                    float4 botLeft = tex2Dlod (_Tex, float4(float2(v.uv.x - v.texStep,v.uv.y-v.texStep),0,0));
-
-                    float4 botRight = tex2Dlod (_Tex, float4(float2(v.uv.x + v.texStep,v.uv.y-v.texStep),0,0));
-
-                    float4 topRight = tex2Dlod (_Tex, float4(float2(v.uv.x + v.texStep,v.uv.y + v.texStep),0,0));
-
-                    float4 topLeft = tex2Dlod (_Tex, float4(float2(v.uv.x - v.texStep,v.uv.y + v.texStep),0,0));
-
-                    float4 vec1 =  (float4(-v.step,topLeft.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0));
-                    float4 vec2 =  (float4(v.step,topRight.r,v.step,0) - float4(-v.step,botLeft.r, -v.step,0));
-
-                    float4 vec3 =  (float4(-v.step,botLeft.r, -v.step,0) - float4(-v.step,topLeft.r,v.step,0));
-                    float4 vec4 =  (float4(-v.step,botLeft.r, -v.step,0) - float4(v.step,botRight.r,v.step,0));
-
-                    float3 norm1 = normalize(cross(vec2,vec1));
-                    float3 norm2 = normalize(cross(vec4,vec3));
-                    return (norm1 + norm2)/ 2.0;
-            }
-
+            uniform float _NoiseAmplitude;
 
             v2f vert (appdata v)
             {
@@ -131,49 +108,21 @@
 
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _Tex);
+
                 //get world position from object position
                 float4 worldPos = mul (unity_ObjectToWorld, v.vertex);
                 o.wpos = worldPos;
 
-                // sample the texture
-                #if !defined(SHADER_API_OPENGL)
-                    float4 height = tex2Dlod (_Tex, float4(float2(v.uv.x,v.uv.y),0,0));
-                    float noise = tex2Dlod (_NoiseMap, float4(float2(o.wpos.x/100.0 + _Count/1000.0,o.wpos.z/100.0),0,0));
-                    v.vertex.y += height.r * 2.0 - _MaxHeight + noise.r /2.0;
+                waterOutput w = GetWaterDistortion(_Tex, _NoiseMap, v.vertex, worldPos, v.uv, _NoiseAmplitude, _Count, _Seperation, _TotalSize, _MaxHeight);
+                v.vertex = w.vertex;
+                o.worldNormal = w.worldNorm;
 
-                    normcalc n;
-                    n.texStep = _Seperation / _TotalSize;
-                    n.step = (0.5 / 50)*3;
-
-                    n.uv = float2(v.uv.x, v.uv.y);
-                    float3 norm = getNormal(n);
-
-                    //calculate neighbour normals
-                    n.uv = float2(v.uv.x + n.step, v.uv.y);
-                    float3 norm1 = getNormal(n);
-
-                    n.uv = float2(v.uv.x - n.step, v.uv.y);
-                    float3 norm2 = getNormal(n);
-
-                    n.uv = float2(v.uv.x, v.uv.y + n.step);
-                    float3 norm3 = getNormal(n);
-
-                    n.uv = float2(v.uv.x, v.uv.y - n.step);
-                    float3 norm4 = getNormal(n);
-
-                    o.worldNormal = (norm + norm1 + norm2 + norm3 + norm4)/5.0;
-
-
-                #endif
-                worldPos = mul (unity_ObjectToWorld, v.vertex);
-                v.vertex.y += sin(worldPos.x / 10.0 - worldPos.z / 5.0)/5.0 + sin(worldPos.z / 15.0 + worldPos.x / 10.0)/4.0;
-                worldPos = mul (unity_ObjectToWorld, v.vertex);
+                worldPos = mul(unity_ObjectToWorld, v.vertex);
+                o.wpos = worldPos;
 
                 o.pos = v.vertex;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _Tex);
-                worldPos.y = worldPos.y;
-                o.wpos = worldPos;
 				o.screenPos = ComputeScreenPos(o.vertex);
                 o.viewDir = WorldSpaceViewDir(v.vertex);
                 return o;
@@ -199,7 +148,7 @@
                 col = _BaseColor * shading *shading;
                 col.a = 1.0;
 
-                float4 bias = clamp(((col*2 + aboveWaterTex*0.9)/1.0)/dist,0.0,0.5);
+                float4 bias = clamp(((col*2 + aboveWaterTex/4.0 - underWaterTex/2.0)/1.0)/dist,0.0,0.5);
                 //col.rb *= dist;
                 bias.a = 1.0;
                 return bias;

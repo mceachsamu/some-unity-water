@@ -679,7 +679,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.019, z: 0.065}
+  m_LocalPosition: {x: 0, y: -0, z: 0.0196}
   m_LocalScale: {x: 0.00854407, y: 0.008544068, z: 0.0018458547}
   m_Children: []
   m_Father: {fileID: 16731828}
@@ -1105,7 +1105,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.2662996, y: -0, z: -0, w: 0.9638903}
+  m_LocalRotation: {x: -0.57455623, y: 0.3061343, z: -0.24480471, w: 0.71849686}
   m_LocalPosition: {x: 0, y: 24, z: -26}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1113,7 +1113,7 @@ Transform:
   - {fileID: 17547646}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -30.888, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -42.512, y: 78.073, z: -72.642}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1162,7 +1162,7 @@ MonoBehaviour:
   numSegs: 100
   segSize: 0.4
   waterOpaqueness: 0.32
-  primaryCol: {r: 0.0754717, g: 0.041127723, b: 0.021715911, a: 1}
+  primaryCol: {r: 0.012281941, g: 0.028011844, b: 0.03773582, a: 1}
   numFieldPoints: 100
   heightMap: {fileID: 0}
   neighbourFriction: 0.012
