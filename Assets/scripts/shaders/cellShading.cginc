@@ -1,4 +1,4 @@
-inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNorm, float3 viewDir, float4 baseColor, float4 _RimColor, float4 _SpecularColor, float _RimAmount, float _Glossiness)
+inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNorm, float3 viewDir, float4 baseColor, float4 _RimColor, float4 _SpecularColor, float specularStrength, float _RimAmount, float _Glossiness)
 {
     float4 lightDir = lightPos - wpos;
 
@@ -7,25 +7,25 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
         lightDir = lightPos;
     }
 
-    float NdotL = smoothstep(0.0,0.2,dot(wNorm, lightDir));
-    float intensity = NdotL;
+    float NdotL = dot(normalize(wNorm), normalize(lightDir));
+    float intensity = (NdotL);
     float overall = intensity;
     // use hard cuttoffs so we get cell effect
-    if (overall < 0.2){
-        overall = 0.5;
-    }
-    if (overall > 0.2){
-        overall = 1.5;
-    }
+    // if (overall < 0.5){
+    //     overall = 0.5;
+    // }
+    // if (overall > 0.5){
+    //     overall = 1.5;
+    // }
     //calculate the specular intensity
-    float3 H = normalize(lightPos + viewDir);
+    float3 H = normalize(normalize(lightDir) + normalize(viewDir));
     float NdotH = dot(wNorm, H);
-    float specIntensity = pow(NdotH * intensity, _Glossiness);
+    float specIntensity = pow(saturate(NdotH), _Glossiness);
 
-    float specularIntensitySmooth = smoothstep(0.0,1.3, specIntensity);
-    float4 specular = specularIntensitySmooth * _SpecularColor;
+    float specularIntensitySmooth = specIntensity;
+    float4 specular = specularIntensitySmooth * _SpecularColor * specularStrength;
 
-    //calculate the rim intentity
+    //calculate the rim intensity
     float4 rimDot = 1 - dot(viewDir, wNorm);
     float rimIntensity = smoothstep(_RimAmount - 0.01, _RimAmount + 0.01, rimDot);
     float4 rim = rimIntensity * _RimColor;
@@ -36,13 +36,14 @@ inline float4 GetShading (float4 wpos, float4 opos, float4 lightPos, float3 wNor
         //directional lighting
         FragToLight = - lightPos;
     }
-    float backLighting = dot(normalize(viewDir), -normalize(lightDir - wNorm * 0.1));
 
-    float4 finalColor = (overall + specular + rim + backLighting*0.8);
+    float backLighting = dot(normalize(viewDir), -normalize(lightDir - wNorm * 0.05));
+
+    float4 finalColor = (overall + specular + backLighting*2.0);
     //we arent using the alpha channel for our final shading, so pass
     //through the NdotL value so we can use it for calculating underwater distortion
     //finalColor.a = NdotL;
     finalColor.a = 1.0;
 
-    return finalColor;//finalColor;
+    return NdotL*2.0 + 0.5 + specular * specIntensity;
 }

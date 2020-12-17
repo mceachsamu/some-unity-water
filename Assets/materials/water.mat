@@ -86,13 +86,14 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 1
-    - _Glossiness: 0
+    - _Glossiness: 5.3
     - _GlossyReflections: 1
-    - _LightExp: 1
+    - _LightExp: 0.37
     - _LightMult: 0.1
     - _MaxHeight: 0
     - _Metallic: 0
     - _Mode: 0
+    - _NoiseAmplitude: 2
     - _NoiseFrequency: 1000
     - _NoiseScrollDive: 2000
     - _OcclusionStrength: 1
@@ -100,6 +101,7 @@ Material:
     - _RimAmount: 0.346
     - _Seperation: 0
     - _SmoothnessTextureChannel: 0
+    - _SpecStrength: 31
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _TotalSize: 0

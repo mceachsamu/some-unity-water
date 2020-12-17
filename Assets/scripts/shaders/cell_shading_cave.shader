@@ -21,6 +21,7 @@
         _AmbientColor("Ambient Color", Color) = (0.0,0.0,0.0,1.0)
         _SpecularColor("Specular Color", Color) = (0.0,0.0,0.0,1)
         _Glossiness("Glossiness", Range(0, 100)) = 14
+        _SpecStrength("specularStrengh", Range(0, 100)) = 1
 
         _RimColor("Rim Color", Color) = (1,1,1,1)
         _RimAmount("Rim Amount", Range(0, 1)) = 1.0
@@ -84,6 +85,7 @@
             uniform int _Count;
 
             uniform float _Glossiness;
+            uniform float _SpecStrength;
             uniform float4 _SpecularColor;
             uniform float4 _RimColor;
             uniform float _RimAmount;
@@ -138,7 +140,7 @@
                 //apply saturation
                 //col.rgb = col.rgb * _Saturation;
 
-                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
+                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _SpecStrength, _RimAmount, _Glossiness);
                 float4 lightDir = _WorldSpaceLightPos0 - i.wpos;
                 float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),_LightExp))*_LightMult;
 

@@ -9,6 +9,8 @@
         _AmbientColor("Ambient Color", Color) = (0.0,0.0,0.0,1.0)
         _SpecularColor("Specular Color", Color) = (0.0,0.0,0.0,1)
         _Glossiness("Glossiness", Range(0, 100)) = 14
+        _SpecStrength("specularStrengh", Range(0, 100)) = 1
+
 
         _RimColor("Rim Color", Color) = (1,1,1,1)
         _RimAmount("Rim Amount", Range(0, 1)) = 1.0
@@ -49,20 +51,21 @@
                 SHADOW_COORDS(7)
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-            sampler2D _NormalMap;
-            float4 _NormalMap_ST;
-            sampler2D _PaintTexture;
-            float4 _PaintTexture_ST;
+            uniform sampler2D _MainTex;
+            uniform float4 _MainTex_ST;
+            uniform sampler2D _NormalMap;
+            uniform float4 _NormalMap_ST;
+            uniform sampler2D _PaintTexture;
+            uniform float4 _PaintTexture_ST;
 
-            float _Glossiness;
-            float4 _SpecularColor;
-            float4 _RimColor;
-            float _RimAmount;
-            float4 _AmbientColor;
-            int _UseNormalMap;
-            float _Saturation;
+            uniform float _Glossiness;
+            uniform float _SpecStrength;
+            uniform float4 _SpecularColor;
+            uniform float4 _RimColor;
+            uniform float _RimAmount;
+            uniform float4 _AmbientColor;
+            uniform int _UseNormalMap;
+            uniform float _Saturation;
 
             v2f vert (appdata_tan v)
             {
@@ -108,7 +111,7 @@
                 //apply saturation
                 col.rgb = col.rgb * _Saturation;
 
-                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
+                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _SpecStrength, _RimAmount, _Glossiness);
                 float4 lightDir = _WorldSpaceLightPos0 - i.wpos;
                 float dist = smoothstep(0,1.0,1.0/pow(length(lightDir),0.3))/4.0;
 

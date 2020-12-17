@@ -23,6 +23,7 @@
         _AmbientColor("Ambient Color", Color) = (0.0,0.0,0.0,1.0)
         _SpecularColor("Specular Color", Color) = (0.1,0.1,0.1,1)
         _Glossiness("Glossiness", Range(0, 100)) = 14
+        _SpecStrength("specularStrength", Range(0, 100)) = 1
 
         _RimColor("Rim Color", Color) = (1,1,1,1)
         _RimAmount("Rim Amount", Range(0, 1)) = 1.0
@@ -60,7 +61,6 @@
                 float2 uv : TEXCOORD0;
             };
 
-
             struct v2f
             {
                 float2 uv : TEXCOORD0;
@@ -90,6 +90,7 @@
             uniform float4 _BaseColor;
 
             uniform float _Glossiness;
+            uniform float _SpecStrength;
             uniform float4 _SpecularColor;
             uniform float4 _RimColor;
             uniform float _RimAmount;
@@ -138,20 +139,20 @@
                 //get the noise value
                 //fixed4 col = tex2D(_NoiseMap, i.uv);
                 //check to see if we should render this fragment (if its inside the pot)
-                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, _BaseColor, _BaseColor, _SpecularColor, _RimAmount, _Glossiness);
+                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0, i.worldNormal, i.viewDir, _BaseColor, _BaseColor, _SpecularColor, _SpecStrength, _RimAmount, _Glossiness);
                 //render the render texure relative to screen position
                 fixed4 underWaterTex = tex2D(_UnderWater, float2(i.screenPos.x, i.screenPos.y)/i.screenPos.w);
                 fixed4 aboveWaterTex = tex2D(_AboveWater, float2(i.screenPos.x + noise.r/2.0, i.screenPos.y + noise.r/5.0 + shading.r/10.0-0.5)/i.screenPos.w);
 
                 float dist = clamp(( (pow(length(i.wpos - _WorldSpaceLightPos0), _LightExp)) * _LightMult),1.0,10.0);\
 
-                col = _BaseColor * shading *shading;
+                col = _BaseColor * shading * shading;
                 col.a = 1.0;
 
-                float4 bias = clamp(((col*2 + aboveWaterTex/4.0 - underWaterTex/2.0)/1.0)/dist,0.0,0.5);
+                float4 bias = clamp(((col*2 + aboveWaterTex/4.0 - underWaterTex/2.0)/1.0),0.0,1.0);
                 //col.rb *= dist;
                 bias.a = 1.0;
-                return bias;
+                return col;
             }
             ENDCG
         }

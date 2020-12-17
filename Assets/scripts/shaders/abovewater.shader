@@ -123,8 +123,6 @@
                 float dist = (1.0 / pow(length(i.wpos - _WorldSpaceCameraPos), _LightExp) * _LightMult);
 
                 fixed4 col = tex2D(_MainTex, i.uv*50.0);
-                //get shading
-                float4 shading = GetShading(i.wpos, i.vertex, _WorldSpaceLightPos0.xyzw, i.worldNormal, i.viewDir, col, _RimColor, _SpecularColor, _RimAmount, _Glossiness);
 
                 float2 waterUV = getWaterUV(i);
                 float waterHeight = tex2D(_HeightMap, waterUV);

@@ -105,8 +105,8 @@ public class water : MonoBehaviour
 
     private void setShaderProperties(){
 
-        this.GetComponent<Renderer>().material.SetFloat("seperation", segSize);
-        this.GetComponent<Renderer>().material.SetFloat("totalSize", getSize());
+        this.GetComponent<Renderer>().material.SetFloat("_Seperation", segSize);
+        this.GetComponent<Renderer>().material.SetFloat("_TotalSize", getSize());
         this.GetComponent<Renderer>().material.SetFloat("_MaxHeight", maxHeight);
         this.GetComponent<Renderer>().material.SetFloat("_Count", count);
 
